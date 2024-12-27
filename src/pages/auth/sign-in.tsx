@@ -1,11 +1,32 @@
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Helmet } from "react-helmet-async"
 
 export function SignIn() {
   return (
     <>
       <Helmet title="Login" />
-      <div className="border-solid">
-        <h1>Sign-in</h1>
+
+      <div className="p-8">
+        <div className="flex w-[350] flex-col justify-center gap-6">
+          <div className="flex flex-col gap-2 text-center">
+            <h1 className="text-2xl font-semibold">
+              Acessar painel
+            </h1>
+            <p>Acompanhe suas vendas pelo painel do parceiro</p>
+          </div>
+
+          <form className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email">Seu e-mail</Label>
+              <Input type="email" id="email" />
+            </div>
+
+            <Button className="w-full font-semibold">Acessar Painel</Button>
+          </form>
+
+        </div>
       </div>
     </>
   )
