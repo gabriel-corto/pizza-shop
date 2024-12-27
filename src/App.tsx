@@ -1,7 +1,8 @@
-import { RouterProvider } from "react-router-dom";
-import "./index.css"
-import { routes } from "./routes";
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import { RouterProvider } from "react-router-dom";
+
+import { routes } from "./routes";             
+import "./index.css"; 
 
 export function App() {
   return (
