@@ -8,10 +8,12 @@ import { Dashboard } from "./pages/app/Dashboard/dashboard";
 import { SignIn } from "./pages/auth/sign-in";
 import { SignUp } from "./pages/auth/sign-up";
 import { Orders } from "./pages/app/Orders/orders";
+import { NotFound } from "./pages/404";
 
 export const routes = createBrowserRouter([
   {
     path: "/",
+    errorElement: <NotFound />,
     element: <AppLayout />,
     children: [
       {path: "", element: <Dashboard />},
