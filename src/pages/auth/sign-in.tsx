@@ -6,9 +6,12 @@ import { LogIn, LogInIcon } from "lucide-react"
 import { Helmet } from "react-helmet-async"
 
 import { useForm  } from "react-hook-form"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { toast } from "sonner"
 import { z } from "zod"
+
+import { useMutation } from "@tanstack/react-query"
+import { signIn } from "@/api/sign-in"
 
 const SignInFormScheme = z.object({
   email: z.string().email()
@@ -18,14 +21,23 @@ type SignInFormData = z.infer<typeof SignInFormScheme>
 
 export function SignIn() {
 
+  const [searchParams] = useSearchParams()
+
   const { register, handleSubmit, formState: { isSubmitting } } = useForm<SignInFormData>({
-    resolver: zodResolver(SignInFormScheme)
+    resolver: zodResolver(SignInFormScheme),
+    defaultValues: {
+      email: searchParams.get("email") ?? ""
+    }
+  })
+
+  const { mutateAsync: authenticate } = useMutation({
+    mutationFn: signIn 
   })
 
   async function handleSignIn(data: SignInFormData) {
     console.log(data)
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await authenticate({ email: data.email })
 
       toast.success("Enviamos um link de autenticação para seu e-mail.", {
         action: {

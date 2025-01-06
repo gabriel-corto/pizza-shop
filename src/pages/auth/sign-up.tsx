@@ -1,7 +1,9 @@
+import { registerRestaurant } from "@/api/register-restaurant"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation } from "@tanstack/react-query"
 import { LogIn, LogInIcon } from "lucide-react"
 import { Helmet } from "react-helmet-async"
 
@@ -27,15 +29,24 @@ export function SignUp() {
     resolver: zodResolver(SignUpFormScheme)
   })
 
+  const { mutateAsync: registerNewRestaurant } = useMutation({
+    mutationFn: registerRestaurant,
+  })
+
   async function handleSignUp(data: SignUpFormData) {
     console.log(data)
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await registerNewRestaurant({
+        restaurantName: data.restaurantName,
+        managerName: data.managerName,
+        phone: data.phone,
+        email: data.email
+      })
 
       toast.success("Restaurante cadastrado com sucesso!", {
         action: {
           label: "Fazer Login",
-          onClick: () => navigate("/sign-in")
+          onClick: () => navigate(`/sign-in?email=${data.email}`)
         }
       })
       
