@@ -1,14 +1,16 @@
-import { DialogDescription } from "@radix-ui/react-dialog";
-import { DialogContent, DialogFooter, DialogHeader } from "./ui/dialog";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { useQuery } from "@tanstack/react-query";
 import { getManagedRestaurant } from "@/api/get-managed-restaurant";
+import { DialogClose, DialogDescription } from "@radix-ui/react-dialog";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Button } from "./ui/button";
+import { DialogContent, DialogFooter, DialogHeader } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { updateProfile } from "@/api/update-profile";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const storeProfileScheme = z.object({
   name: z.string().min(1),
@@ -21,15 +23,37 @@ export function StoreProfileDialog() {
   const { data: managedRestaurant } = useQuery({
     queryKey: ["managed-restaurant"],
     queryFn: getManagedRestaurant,
+    staleTime: Infinity,
   });
 
-  const { register, handleSubmit } = useForm<StoreProfile>({
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<StoreProfile>({
     resolver: zodResolver(storeProfileScheme),
     values: {
       name: managedRestaurant?.name ?? "",
       description: managedRestaurant?.description ?? "",
     },
   });
+
+  const { mutateAsync: updateProfileFn } = useMutation({
+    mutationFn: updateProfile,
+  });
+
+  async function handleUpdateStoreProfile(data: StoreProfile) {
+    try {
+      await updateProfileFn({
+        name: data.name,
+        description: data.description,
+      });
+
+      toast.success("Perfil actualizado com sucesso!");
+    } catch {
+      toast.error("Falha ao actualizar perfil!");
+    }
+  }
 
   return (
     <DialogContent>
@@ -38,7 +62,7 @@ export function StoreProfileDialog() {
         Actualize as informações da sua loja visível aos clientes
       </DialogDescription>
 
-      <form className="p-2">
+      <form className="p-2" onSubmit={handleSubmit(handleUpdateStoreProfile)}>
         <div className="space-y-4 py-4">
           <div className="grid grid-cols-4 gap-4 items-center">
             <Label className="text-right" htmlFor="name">
@@ -60,10 +84,13 @@ export function StoreProfileDialog() {
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="ghost">
-            Cancelar
-          </Button>
-          <Button type="submit" variant="success">
+          <DialogClose asChild>
+            <Button type="button" variant="ghost">
+              Cancelar
+            </Button>
+          </DialogClose>
+
+          <Button type="submit" variant="success" disabled={isSubmitting}>
             Salvar
           </Button>
         </DialogFooter>
