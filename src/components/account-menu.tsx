@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@/api/get-profile";
 import { getManagedRestaurant } from "@/api/get-managed-restaurant";
 import { Skeleton } from "./ui/skeleton";
+import { Dialog, DialogTrigger } from "./ui/dialog";
+import { StoreProfileDialog } from "./store-profile.dialog";
 
 export function AccountMenu() {
   const { data: profile, isLoading: isProfileLoading } = useQuery({
@@ -26,47 +28,53 @@ export function AccountMenu() {
     });
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex items-center">
-          {isManagedRestaurantLoading ? (
-            <Skeleton className="h-4 w-40" />
-          ) : (
-            managedRestaurant?.name
-          )}
-          <ChevronDown className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
+    <Dialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="flex items-center">
+            {isManagedRestaurantLoading ? (
+              <Skeleton className="h-4 w-40" />
+            ) : (
+              managedRestaurant?.name
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="flex flex-col gap-2">
-          {isProfileLoading ? (
-            <div className="space-y-1.5">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-24" />
-            </div>
-          ) : (
-            <>
-              <span>{profile?.name}</span>
-              <span className="text-xs text-muted-foreground">
-                {profile?.email}
-              </span>
-            </>
-          )}
-        </DropdownMenuLabel>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel className="flex flex-col gap-2">
+            {isProfileLoading ? (
+              <div className="space-y-1.5">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            ) : (
+              <>
+                <span>{profile?.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {profile?.email}
+                </span>
+              </>
+            )}
+          </DropdownMenuLabel>
 
-        <DropdownMenuSeparator />
+          <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
-          <Building />
-          <span>Perfil da loja</span>
-        </DropdownMenuItem>
+          <DialogTrigger asChild>
+            <DropdownMenuItem>
+              <Building />
+              <span>Perfil da loja</span>
+            </DropdownMenuItem>
+          </DialogTrigger>
 
-        <DropdownMenuItem className="text-rose-500 dark:text-rose-400">
-          <LogOut />
-          <span>Sair</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuItem className="text-rose-500 dark:text-rose-400">
+            <LogOut />
+            <span>Sair</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <StoreProfileDialog />
+    </Dialog>
   );
 }
