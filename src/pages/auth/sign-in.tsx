@@ -1,55 +1,57 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { LogIn, LogInIcon } from "lucide-react"
-import { Helmet } from "react-helmet-async"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LogIn, LogInIcon } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
-import { useForm  } from "react-hook-form"
-import { Link, useSearchParams } from "react-router-dom"
-import { toast } from "sonner"
-import { z } from "zod"
+import { useForm } from "react-hook-form";
+import { Link, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+import { z } from "zod";
 
-import { useMutation } from "@tanstack/react-query"
-import { signIn } from "@/api/sign-in"
+import { useMutation } from "@tanstack/react-query";
+import { signIn } from "@/api/sign-in";
 
 const SignInFormScheme = z.object({
-  email: z.string().email()
-})
+  email: z.string().email(),
+});
 
-type SignInFormData = z.infer<typeof SignInFormScheme>
+type SignInFormData = z.infer<typeof SignInFormScheme>;
 
 export function SignIn() {
+  const [searchParams] = useSearchParams();
 
-  const [searchParams] = useSearchParams()
-
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm<SignInFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<SignInFormData>({
     resolver: zodResolver(SignInFormScheme),
     defaultValues: {
-      email: searchParams.get("email") ?? ""
-    }
-  })
+      email: searchParams.get("email") ?? "",
+    },
+  });
 
   const { mutateAsync: authenticate } = useMutation({
-    mutationFn: signIn 
-  })
+    mutationFn: signIn,
+  });
 
   async function handleSignIn(data: SignInFormData) {
-    console.log(data)
     try {
-      await authenticate({ email: data.email })
+      await authenticate({ email: data.email });
 
       toast.success("Enviamos um link de autenticação para seu e-mail.", {
         action: {
           label: "Reenviar",
-          onClick: () => {handleSignIn(data)}
-        }
-      })
-      
+          onClick: () => {
+            handleSignIn(data);
+          },
+        },
+      });
     } catch {
-      toast.error("Credencias inválidas.")
+      toast.error("Credencias inválidas.");
     }
-
   }
 
   return (
@@ -57,19 +59,16 @@ export function SignIn() {
       <Helmet title="Login" />
 
       <div className="p-8">
-
         <Button variant="ghost" className="absolute top-8 right-8" asChild>
           <Link to="/sign-up">
             <LogInIcon />
-            Novo estabelecimento 
+            Novo estabelecimento
           </Link>
         </Button>
 
         <div className="flex w-[350] flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
-            <h1 className="text-2xl font-semibold">
-              Acessar painel
-            </h1>
+            <h1 className="text-2xl font-semibold">Acessar painel</h1>
             <p>Acompanhe suas vendas pelo painel do parceiro</p>
           </div>
 
@@ -79,14 +78,17 @@ export function SignIn() {
               <Input type="email" id="email" {...register("email")} />
             </div>
 
-            <Button disabled={isSubmitting} type="submit" className="w-full font-semibold">
+            <Button
+              disabled={isSubmitting}
+              type="submit"
+              className="w-full font-semibold"
+            >
               <LogIn />
               Acessar Painel
             </Button>
           </form>
-
         </div>
       </div>
     </>
-  )
+  );
 }
