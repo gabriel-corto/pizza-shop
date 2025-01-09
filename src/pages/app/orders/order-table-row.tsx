@@ -3,9 +3,21 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Search, ArrowRight, X } from "lucide-react";
 import { OrderDetails } from "./order-details";
+import { OrderStatus } from "./order-status";
 
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-export function OrderTableRow() {
+interface OrderProps {
+  order: {
+    orderId: string;
+    createdAt: string;
+    status: "pending" | "canceled" | "processing" | "delivering" | "delivered";
+    customerName: string;
+    total: number;
+  };
+}
+export function OrderTableRow({ order }: OrderProps) {
   return (
     <TableRow>
       <TableCell>
@@ -22,19 +34,24 @@ export function OrderTableRow() {
       </TableCell>
 
       <TableCell className="font-mono text-xs font-medium">
-        jgdowdwdgwdsdgddfs
+        {order.orderId}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        há 15 minutos
+        {formatDistanceToNow(order.createdAt, {
+          locale: ptBR,
+          addSuffix: true,
+        })}
       </TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-slate-400" />
-          <span className="font-medium text-muted-foreground">Pendente</span>
-        </div>
+        <OrderStatus status={order.status} />
       </TableCell>
-      <TableCell className="font-medium">Gabriel Francisco</TableCell>
-      <TableCell className="font-medium">R$ 149,90</TableCell>
+      <TableCell className="font-medium">{order.customerName}</TableCell>
+      <TableCell className="font-medium">
+        {order.total.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "Akz",
+        })}
+      </TableCell>
       <TableCell>
         <Button size="xs" variant="outline">
           <ArrowRight className="mr h-3 w-3" />
@@ -48,5 +65,5 @@ export function OrderTableRow() {
         </Button>
       </TableCell>
     </TableRow>
-  )
+  );
 }
