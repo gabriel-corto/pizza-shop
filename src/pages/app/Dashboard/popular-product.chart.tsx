@@ -1,15 +1,9 @@
+import { getPopularProducts } from "@/api/get-popular-products";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
 import { BarChart } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import colors from "tailwindcss/colors"
-
-const data = [
-  { product: "Muzarela", amount: 30},
-  { product: "Maguerita", amount: 14},
-  { product: "Com Frango", amount: 16},
-  { product: "8 Fatias", amount: 18},
-  { product: "Peperonni", amount: 21},
-]
+import colors from "tailwindcss/colors";
 
 const COLORS = [
   colors.sky[500],
@@ -17,9 +11,13 @@ const COLORS = [
   colors.rose[500],
   colors.violet[500],
   colors.amber[500],
-]
+];
 
 export function PopularProductChart() {
+  const { data: popularProducts } = useQuery({
+    queryKey: ["metrics", "popular-products"],
+    queryFn: getPopularProducts,
+  });
   return (
     <Card className="col-span-3">
       <CardHeader className="pb-8">
@@ -32,60 +30,61 @@ export function PopularProductChart() {
       </CardHeader>
 
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart style={{ fontSize: 12 }}> 
-            <Pie 
-              data={data} 
-              dataKey="amount" 
-              nameKey="product"
-              outerRadius={84}
-              innerRadius={64}
-              strokeWidth={8}
+        {popularProducts && (
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart style={{ fontSize: 12 }}>
+              <Pie
+                data={popularProducts}
+                dataKey="amount"
+                nameKey="product"
+                outerRadius={84}
+                innerRadius={64}
+                strokeWidth={8}
+                label={({
+                  cx,
+                  cy,
+                  midAngle,
+                  innerRadius,
+                  outerRadius,
+                  value,
+                  index,
+                }) => {
+                  const RADIAN = Math.PI / 180;
+                  const radius = 12 + innerRadius + (outerRadius - innerRadius);
+                  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                  const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-              label={({
-                cx,
-                cy,
-                midAngle,
-                innerRadius,
-                outerRadius,
-                value,
-                index,
-              }) => {
-                const RADIAN = Math.PI / 180
-                const radius = 12 + innerRadius + (outerRadius - innerRadius)
-                const x = cx + radius * Math.cos(-midAngle * RADIAN)
-                const y = cy + radius * Math.sin(-midAngle * RADIAN)
-
-                return (
-                  <text
-                    x={x}
-                    y={y}
-                    className="fill-muted-foreground text-xs"
-                    textAnchor={x > cx ? 'start' : 'end'}
-                    dominantBaseline="central"
-                  >
-                    {data[index].product
-                      .substring(0, 12)
-                      .concat('...')}{' '}
-                    ({value})
-                  </text>
-                )
-              }}
-              labelLine={false}
+                  return (
+                    <text
+                      x={x}
+                      y={y}
+                      className="fill-muted-foreground text-xs"
+                      textAnchor={x > cx ? "start" : "end"}
+                      dominantBaseline="central"
+                    >
+                      {popularProducts[index].product
+                        .substring(0, 12)
+                        .concat("...")}{" "}
+                      ({value})
+                    </text>
+                  );
+                }}
+                labelLine={false}
               >
-              {data.map((_, index) => {
-                return (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={COLORS[index]} 
-                    className="stroke-background"
+                {popularProducts.map((_, index) => {
+                  return (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index]}
+                      className="stroke-background"
                     />
-                )
-              })}
-            </Pie>
-          </PieChart>            
-        </ResponsiveContainer>
+                  );
+                })}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
-  )
+  );
 }
