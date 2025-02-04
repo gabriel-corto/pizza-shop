@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -35,7 +36,7 @@ export function RevenueChart() {
       </CardHeader>
 
       <CardContent>
-        {dailyRevenueInPeriod && (
+        {dailyRevenueInPeriod ? (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={dailyRevenueInPeriod} style={{ fontSize: 13 }}>
               <YAxis
@@ -60,6 +61,10 @@ export function RevenueChart() {
               />
             </LineChart>
           </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center w-full h-[240px]">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
         )}
       </CardContent>
     </Card>
