@@ -63,7 +63,6 @@ export function OrderTableRow({ order }: OrderProps) {
           <OrderDetails orderId={order.orderId} />
         </Dialog>
       </TableCell>
-
       <TableCell className="font-mono text-xs font-medium">
         {order.orderId}
       </TableCell>
@@ -76,7 +75,7 @@ export function OrderTableRow({ order }: OrderProps) {
       <TableCell>
         <OrderStatus status={order.status} />
       </TableCell>
-      <TableCell className="font-medium">{order.customerName}</TableCell>
+      <TableCell className="font-medium">{order.customerName}</TableCell>{" "}
       <TableCell className="font-medium">
         {order.total.toLocaleString("pt-BR", {
           style: "currency",
